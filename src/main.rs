@@ -17,11 +17,9 @@ use std::env;
 
 fn parse_args() -> Arguments {
     let args: Vec<String> = env::args().skip(1).collect();
-
     if args.len() != 1 {
         print_usage();
     }
-
     Arguments {
         root: args[0].clone(),
     }
@@ -50,21 +48,17 @@ fn print_event(evt: Event) {
         println!("{}{:?}",str, path);
     }
 }
-use notify::{RecommendedWatcher, RecursiveMode, Result, Watcher};
+
+use notify::{RecursiveMode, Result, Watcher};
 use std::path::Path;
 use std::{thread, time};
 fn main() -> Result<()> {
     let args = parse_args();
-    // Automatically select the best implementation for your platform.
     let mut watcher = notify::recommended_watcher(|res| match res {
         Ok(event) => print_event(event),
         Err(e) => eprintln!("watch error: {:?}", e),
     })?;
-
-    // Add a path to be watched. All files and directories at that path and
-    // below will be monitored for changes.
     watcher.watch(Path::new(&args.root), RecursiveMode::Recursive)?;
-
     loop {
         thread::sleep(time::Duration::from_secs(1));
     }
